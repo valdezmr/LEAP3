@@ -1,6 +1,5 @@
 library(tidyverse)
 subs <- c(seq(302,304), seq(328,339), 350, seq(352,355), seq(377,381))
-
 expDir <- '/Users/maddie/Library/CloudStorage/Box-Box/LEAP/version3/'
 
 for (s in subs){
@@ -21,8 +20,7 @@ for (s in subs){
                             if_else(block_desc == 'HiDemTar', 'hd',
                                     if_else(block_desc == 'HiDemNoTar', 'hd',
                                             if_else(block_desc == 'LoDemTar', 'ld', NA))))) %>% 
- rename(context = stim_location, correct_key = corr_key) 
-        # pressedQ_blank = blankQResp.keys, pressedQ_fix = lateQResp.keys)
+ rename(context = stim_location, correct_key = corr_key)
   
   if ('pressedQ' %in% colnames(data) == F){
     data$pressedQ <- c(rep(NA, nrow(data)))
@@ -35,6 +33,9 @@ for (s in subs){
   }
   
   data <- data %>% rename(pressedQ_fix = pressedQ_late)
+  data <- data %>% mutate(pressedQ = if_else(!is.na(pressedQ),1,NA)) %>% 
+    mutate(pressedQ_blank = if_else(!is.na(pressedQ_blank),1,NA)) %>% 
+    mutate(pressedQ_fix = if_else(!is.na(pressedQ_fix),1,NA))
   
   data <- data %>%
     select(c('procedure','block','trial','PMdemand','context','stim', 'role',
@@ -43,6 +44,7 @@ for (s in subs){
     subset(!is.na(trial))
 
   write.csv(data,
-            file = paste0(expDir, 'data/cleaned_data/',s, '_leap3_cleaned.csv'),
+            file = paste0(expDir, 'cleaned_data/',s, '_leap3_cleaned.csv'),
             row.names = F)
 }
+
